@@ -1,14 +1,18 @@
 "use client";
 
 import { useState } from "react";
-import { ArrowLeft, ArrowRight, Copy, Download, Check } from "lucide-react";
+import { ArrowLeft, ArrowRight, Copy, Download, Check, Sparkles, FileText, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { PolicyFormData } from "@/lib/policy-templates";
+import { generatePolicyWithAI } from "@/lib/generate-policy-ai";
+import { incrementLocalGenerationCount } from "@/lib/usage";
 
 interface PolicyWizardProps {
   policyType: "privacy-policy" | "terms-of-service" | "cookie-policy" | "refund-policy";
   title: string;
   onGenerate: (data: PolicyFormData) => string;
+  isPaid?: boolean;
+  onGenerated?: () => void;
 }
 
 type StepId =
@@ -91,10 +95,12 @@ const cookieTypeOptions = [
   { value: "marketing", label: "Marketing (advertising)" },
 ];
 
-export function PolicyWizard({ policyType, title, onGenerate }: PolicyWizardProps) {
+export function PolicyWizard({ policyType, title, onGenerate, isPaid = false, onGenerated }: PolicyWizardProps) {
   const [step, setStep] = useState(0);
   const [generatedHtml, setGeneratedHtml] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [generating, setGenerating] = useState(false);
+  const [aiGenerated, setAiGenerated] = useState(false);
   const [formData, setFormData] = useState<PolicyFormData>({
     businessName: "",
     websiteUrl: "",
@@ -128,9 +134,26 @@ export function PolicyWizard({ policyType, title, onGenerate }: PolicyWizardProp
   const currentStepId = stepIds[step];
   const totalSteps = steps.length;
 
-  const handleGenerate = () => {
-    const html = onGenerate(formData);
-    setGeneratedHtml(html);
+  const handleGenerate = async () => {
+    if (isPaid) {
+      setGenerating(true);
+      try {
+        const html = await generatePolicyWithAI(policyType, formData);
+        setGeneratedHtml(html);
+        setAiGenerated(true);
+      } catch {
+        // Fallback to template if AI fails
+        const html = onGenerate(formData);
+        setGeneratedHtml(html);
+      } finally {
+        setGenerating(false);
+      }
+    } else {
+      const html = onGenerate(formData);
+      setGeneratedHtml(html);
+    }
+    incrementLocalGenerationCount();
+    onGenerated?.();
   };
 
   const handleCopyHtml = async () => {
@@ -187,7 +210,18 @@ ${generatedHtml}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
           <div>
             <h1 className="text-2xl font-bold">{title}</h1>
-            <p className="text-muted text-sm mt-1">Generated for {formData.businessName}</p>
+            <div className="flex items-center gap-2 mt-1">
+              <p className="text-muted text-sm">Generated for {formData.businessName}</p>
+              {aiGenerated ? (
+                <span className="inline-flex items-center gap-1 bg-primary-light text-primary text-xs font-medium px-2 py-0.5 rounded-full">
+                  <Sparkles className="w-3 h-3" /> AI-Tailored
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-1 bg-gray-100 text-muted text-xs font-medium px-2 py-0.5 rounded-full">
+                  <FileText className="w-3 h-3" /> Basic Template
+                </span>
+              )}
+            </div>
           </div>
           <div className="flex gap-3">
             <button
@@ -504,9 +538,14 @@ ${generatedHtml}
         ) : (
           <button
             onClick={handleGenerate}
-            className="inline-flex items-center gap-2 bg-primary text-white px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-primary-dark transition-colors"
+            disabled={generating}
+            className="inline-flex items-center gap-2 bg-primary text-white px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-primary-dark transition-colors disabled:opacity-50"
           >
-            Generate Policy <ArrowRight className="w-4 h-4" />
+            {generating ? (
+              <><Loader2 className="w-4 h-4 animate-spin" /> Generating...</>
+            ) : (
+              <>Generate Policy <ArrowRight className="w-4 h-4" /></>
+            )}
           </button>
         )}
       </div>
