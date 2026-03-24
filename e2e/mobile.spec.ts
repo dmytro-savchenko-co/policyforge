@@ -30,7 +30,7 @@ test.describe("Mobile responsive", () => {
     await page.getByPlaceholder("Acme Inc.").fill("Mobile Co");
     await page.getByPlaceholder("https://example.com").fill("https://m.co");
     await page.getByPlaceholder("contact@example.com").fill("a@m.co");
-    await page.getByRole("button", { name: "Next" }).click();
-    await expect(page.getByText("Refund Details")).toBeVisible();
+    await page.getByRole("button", { name: "Next", exact: true }).click();
+    await expect(page.getByRole("heading", { name: "Refund Details" })).toBeVisible();
   });
 });

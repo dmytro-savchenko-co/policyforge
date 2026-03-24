@@ -13,26 +13,26 @@ test.describe("Privacy Policy Generation", () => {
 
     // Step 0: Business Info
     await fillBusinessInfo(page);
-    await page.getByRole("button", { name: "Next" }).click();
+    await page.getByRole("button", { name: "Next", exact: true }).click();
 
     // Step 1: Jurisdictions
-    await expect(page.getByText("Jurisdictions")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Jurisdictions" })).toBeVisible();
     await page.getByText("GDPR (European Union)").click();
-    await page.getByRole("button", { name: "Next" }).click();
+    await page.getByRole("button", { name: "Next", exact: true }).click();
 
     // Step 2: Data Collection
-    await expect(page.getByText("Data Collection")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Data Collection" })).toBeVisible();
     await page.getByText("Email Addresses").click();
     await page.getByText("Names").click();
-    await page.getByRole("button", { name: "Next" }).click();
+    await page.getByRole("button", { name: "Next", exact: true }).click();
 
     // Step 3: Third-Party Services
-    await expect(page.getByText("Third-Party Services")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Third-Party Services" })).toBeVisible();
     await page.getByText("Google Analytics").click();
-    await page.getByRole("button", { name: "Next" }).click();
+    await page.getByRole("button", { name: "Next", exact: true }).click();
 
     // Step 4: Cookies
-    await expect(page.getByText("Cookies")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Cookies" })).toBeVisible();
     await page.getByRole("button", { name: "Generate Policy" }).click();
 
     // Output
@@ -60,7 +60,7 @@ test.describe("Terms of Service Generation", () => {
     await expect(page.getByPlaceholder("United States")).toBeVisible();
     await page.getByPlaceholder("United States").fill("Canada");
     await page.getByText("Users can create accounts").click();
-    await page.getByRole("button", { name: "Next" }).click();
+    await page.getByRole("button", { name: "Next", exact: true }).click();
 
     // Step 1: Jurisdictions (last step)
     await page.getByText("CCPA (California, USA)").click();
@@ -78,16 +78,16 @@ test.describe("Cookie Policy Generation", () => {
     await page.goto("/generator/cookie-policy");
 
     await fillBusinessInfo(page);
-    await page.getByRole("button", { name: "Next" }).click();
+    await page.getByRole("button", { name: "Next", exact: true }).click();
 
     // Jurisdictions
     await page.getByText("GDPR (European Union)").click();
-    await page.getByRole("button", { name: "Next" }).click();
+    await page.getByRole("button", { name: "Next", exact: true }).click();
 
     // Cookies step (before third-party)
     await expect(page.getByText("Essential (login, security)")).toBeVisible();
     await page.getByText("Analytics (usage tracking)").click();
-    await page.getByRole("button", { name: "Next" }).click();
+    await page.getByRole("button", { name: "Next", exact: true }).click();
 
     // Third-party
     await expect(page.getByText("Google Analytics")).toBeVisible();
@@ -103,13 +103,13 @@ test.describe("Refund Policy Generation", () => {
 
     await fillBusinessInfo(page);
     await page.getByText("SaaS / Web App").click();
-    await page.getByRole("button", { name: "Next" }).click();
+    await page.getByRole("button", { name: "Next", exact: true }).click();
 
     // Refund details (NOT jurisdictions)
-    await expect(page.getByText("Refund Details")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Refund Details" })).toBeVisible();
     await expect(page.getByText("Refund Window (days)")).toBeVisible();
     // Should NOT show jurisdictions
-    await expect(page.getByText("Jurisdictions")).not.toBeVisible();
+    await expect(page.getByRole("heading", { name: "Jurisdictions" })).not.toBeVisible();
 
     await page.getByRole("button", { name: "Generate Policy" }).click();
     await expect(page.getByText("Refund Policy for Test Company")).toBeVisible();
@@ -120,7 +120,7 @@ test.describe("Refund Policy Generation", () => {
 test.describe("Validation", () => {
   test("cannot proceed past step 0 without required fields", async ({ page }) => {
     await page.goto("/generator/privacy-policy");
-    const nextBtn = page.getByRole("button", { name: "Next" });
+    const nextBtn = page.getByRole("button", { name: "Next", exact: true });
     await expect(nextBtn).toHaveClass(/cursor-not-allowed/);
 
     // Fill only name — still blocked
@@ -133,7 +133,7 @@ test.describe("Output actions", () => {
   test("generate another resets wizard", async ({ page }) => {
     await page.goto("/generator/refund-policy");
     await fillBusinessInfo(page);
-    await page.getByRole("button", { name: "Next" }).click();
+    await page.getByRole("button", { name: "Next", exact: true }).click();
     await page.getByRole("button", { name: "Generate Policy" }).click();
     await expect(page.getByText("Generated for Test Company")).toBeVisible();
 
@@ -144,12 +144,12 @@ test.describe("Output actions", () => {
   test("download button triggers download", async ({ page }) => {
     await page.goto("/generator/refund-policy");
     await fillBusinessInfo(page);
-    await page.getByRole("button", { name: "Next" }).click();
+    await page.getByRole("button", { name: "Next", exact: true }).click();
     await page.getByRole("button", { name: "Generate Policy" }).click();
 
     const [download] = await Promise.all([
       page.waitForEvent("download"),
-      page.getByText("Download").click(),
+      page.getByRole("button", { name: "Download" }).click(),
     ]);
     expect(download.suggestedFilename()).toContain("refund-policy");
   });
