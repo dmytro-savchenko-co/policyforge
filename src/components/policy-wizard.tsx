@@ -11,6 +11,40 @@ interface PolicyWizardProps {
   onGenerate: (data: PolicyFormData) => string;
 }
 
+type StepId =
+  | "business-info"
+  | "business-info-terms"
+  | "business-info-refund"
+  | "jurisdictions"
+  | "data-collection"
+  | "third-party"
+  | "cookies"
+  | "refund-details";
+
+interface StepDef {
+  id: StepId;
+  title: string;
+  subtitle: string;
+}
+
+const STEP_DEFS: Record<StepId, Omit<StepDef, "id">> = {
+  "business-info": { title: "Business Info", subtitle: "Tell us about your business" },
+  "business-info-terms": { title: "Business Info", subtitle: "Tell us about your business" },
+  "business-info-refund": { title: "Business Info", subtitle: "Tell us about your business" },
+  jurisdictions: { title: "Jurisdictions", subtitle: "Where do your users come from?" },
+  "data-collection": { title: "Data Collection", subtitle: "What data do you collect?" },
+  "third-party": { title: "Third-Party Services", subtitle: "Which services do you use?" },
+  cookies: { title: "Cookies", subtitle: "What cookies do you use?" },
+  "refund-details": { title: "Refund Details", subtitle: "Your refund terms" },
+};
+
+const STEP_CONFIGS: Record<string, StepId[]> = {
+  "privacy-policy": ["business-info", "jurisdictions", "data-collection", "third-party", "cookies"],
+  "terms-of-service": ["business-info-terms", "jurisdictions"],
+  "cookie-policy": ["business-info", "jurisdictions", "cookies", "third-party"],
+  "refund-policy": ["business-info-refund", "refund-details"],
+};
+
 const businessTypes = [
   { value: "website", label: "Website" },
   { value: "app", label: "Mobile App" },
@@ -89,18 +123,9 @@ export function PolicyWizard({ policyType, title, onGenerate }: PolicyWizardProp
     }));
   };
 
-  const showCookieStep = policyType === "cookie-policy" || policyType === "privacy-policy";
-  const showRefundStep = policyType === "refund-policy";
-
-  const steps = [
-    { title: "Business Info", subtitle: "Tell us about your business" },
-    { title: "Jurisdictions", subtitle: "Where do your users come from?" },
-    { title: "Data Collection", subtitle: "What data do you collect?" },
-    { title: "Third-Party Services", subtitle: "Which services do you use?" },
-    ...(showCookieStep ? [{ title: "Cookies", subtitle: "What cookies do you use?" }] : []),
-    ...(showRefundStep ? [{ title: "Refund Details", subtitle: "Your refund terms" }] : []),
-  ];
-
+  const stepIds = STEP_CONFIGS[policyType];
+  const steps: StepDef[] = stepIds.map((id) => ({ id, ...STEP_DEFS[id] }));
+  const currentStepId = stepIds[step];
   const totalSteps = steps.length;
 
   const handleGenerate = () => {
@@ -205,90 +230,78 @@ ${generatedHtml}
   }
 
   const canProceed = () => {
-    if (step === 0) return formData.businessName && formData.websiteUrl && formData.contactEmail;
-    if (step === 1) return formData.jurisdictions.length > 0;
+    const sid = currentStepId;
+    if (sid === "business-info" || sid === "business-info-terms" || sid === "business-info-refund") {
+      return !!(formData.businessName && formData.websiteUrl && formData.contactEmail);
+    }
+    if (sid === "jurisdictions") return formData.jurisdictions.length > 0;
     return true;
   };
 
-  return (
-    <div className="max-w-2xl mx-auto px-4 sm:px-6 py-12">
-      <h1 className="text-2xl font-bold text-center mb-2">{title} Generator</h1>
-      <p className="text-muted text-center mb-8">Answer a few questions to generate your customized policy.</p>
-
-      {/* Progress */}
-      <div className="flex items-center gap-2 mb-10">
-        {steps.map((s, i) => (
-          <div key={s.title} className="flex-1 flex flex-col items-center">
-            <div
+  // Shared business info fields (name, url, email, type)
+  const renderBaseBusinessFields = () => (
+    <>
+      <div>
+        <label className="block text-sm font-medium mb-1.5">Business Name *</label>
+        <input
+          type="text"
+          value={formData.businessName}
+          onChange={(e) => updateField("businessName", e.target.value)}
+          placeholder="Acme Inc."
+          className="w-full border border-border rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
+        />
+      </div>
+      <div>
+        <label className="block text-sm font-medium mb-1.5">Website URL *</label>
+        <input
+          type="url"
+          value={formData.websiteUrl}
+          onChange={(e) => updateField("websiteUrl", e.target.value)}
+          placeholder="https://example.com"
+          className="w-full border border-border rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
+        />
+      </div>
+      <div>
+        <label className="block text-sm font-medium mb-1.5">Contact Email *</label>
+        <input
+          type="email"
+          value={formData.contactEmail}
+          onChange={(e) => updateField("contactEmail", e.target.value)}
+          placeholder="contact@example.com"
+          className="w-full border border-border rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
+        />
+      </div>
+      <div>
+        <label className="block text-sm font-medium mb-1.5">Business Type</label>
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+          {businessTypes.map((bt) => (
+            <button
+              key={bt.value}
+              onClick={() => updateField("businessType", bt.value)}
               className={cn(
-                "w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-colors",
-                i === step ? "bg-primary text-white" : i < step ? "bg-success text-white" : "bg-gray-200 text-muted"
+                "border rounded-lg px-3 py-2 text-sm transition-colors",
+                formData.businessType === bt.value
+                  ? "border-primary bg-primary-light text-primary font-medium"
+                  : "border-border hover:border-primary/50"
               )}
             >
-              {i < step ? <Check className="w-4 h-4" /> : i + 1}
-            </div>
-            <span className="text-xs text-muted mt-1 hidden sm:block">{s.title}</span>
-          </div>
-        ))}
+              {bt.label}
+            </button>
+          ))}
+        </div>
       </div>
+    </>
+  );
 
-      {/* Step Content */}
-      <div className="border border-border rounded-2xl p-6 sm:p-8 bg-white min-h-[320px]">
-        <h2 className="text-lg font-semibold mb-1">{steps[step].title}</h2>
-        <p className="text-sm text-muted mb-6">{steps[step].subtitle}</p>
+  const renderStepContent = () => {
+    switch (currentStepId) {
+      case "business-info":
+        return <div className="space-y-4">{renderBaseBusinessFields()}</div>;
 
-        {/* Step 0: Business Info */}
-        {step === 0 && (
+      case "business-info-terms":
+        return (
           <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium mb-1.5">Business Name *</label>
-              <input
-                type="text"
-                value={formData.businessName}
-                onChange={(e) => updateField("businessName", e.target.value)}
-                placeholder="Acme Inc."
-                className="w-full border border-border rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1.5">Website URL *</label>
-              <input
-                type="url"
-                value={formData.websiteUrl}
-                onChange={(e) => updateField("websiteUrl", e.target.value)}
-                placeholder="https://example.com"
-                className="w-full border border-border rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1.5">Contact Email *</label>
-              <input
-                type="email"
-                value={formData.contactEmail}
-                onChange={(e) => updateField("contactEmail", e.target.value)}
-                placeholder="contact@example.com"
-                className="w-full border border-border rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1.5">Business Type</label>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                {businessTypes.map((bt) => (
-                  <button
-                    key={bt.value}
-                    onClick={() => updateField("businessType", bt.value)}
-                    className={cn(
-                      "border rounded-lg px-3 py-2 text-sm transition-colors",
-                      formData.businessType === bt.value
-                        ? "border-primary bg-primary-light text-primary font-medium"
-                        : "border-border hover:border-primary/50"
-                    )}
-                  >
-                    {bt.label}
-                  </button>
-                ))}
-              </div>
-            </div>
+            {renderBaseBusinessFields()}
             <div>
               <label className="block text-sm font-medium mb-1.5">Country</label>
               <input
@@ -320,10 +333,13 @@ ${generatedHtml}
               </label>
             </div>
           </div>
-        )}
+        );
 
-        {/* Step 1: Jurisdictions */}
-        {step === 1 && (
+      case "business-info-refund":
+        return <div className="space-y-4">{renderBaseBusinessFields()}</div>;
+
+      case "jurisdictions":
+        return (
           <div className="space-y-3">
             <p className="text-sm text-muted">Select all jurisdictions that apply to your users:</p>
             {jurisdictionOptions.map((j) => (
@@ -341,10 +357,10 @@ ${generatedHtml}
               </button>
             ))}
           </div>
-        )}
+        );
 
-        {/* Step 2: Data Collection */}
-        {step === 2 && (
+      case "data-collection":
+        return (
           <div className="space-y-2">
             <p className="text-sm text-muted mb-4">Select all types of data you collect:</p>
             <div className="grid grid-cols-2 gap-2">
@@ -364,10 +380,10 @@ ${generatedHtml}
               ))}
             </div>
           </div>
-        )}
+        );
 
-        {/* Step 3: Third Party */}
-        {step === 3 && (
+      case "third-party":
+        return (
           <div className="space-y-2">
             <p className="text-sm text-muted mb-4">Select third-party services you use:</p>
             <div className="grid grid-cols-2 gap-2">
@@ -387,10 +403,10 @@ ${generatedHtml}
               ))}
             </div>
           </div>
-        )}
+        );
 
-        {/* Cookie Step */}
-        {showCookieStep && step === 4 && (
+      case "cookies":
+        return (
           <div className="space-y-2">
             <p className="text-sm text-muted mb-4">What types of cookies does your site use?</p>
             {cookieTypeOptions.map((c) => (
@@ -408,10 +424,10 @@ ${generatedHtml}
               </button>
             ))}
           </div>
-        )}
+        );
 
-        {/* Refund Step */}
-        {showRefundStep && step === 4 && (
+      case "refund-details":
+        return (
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium mb-1.5">Refund Window (days)</label>
@@ -423,9 +439,40 @@ ${generatedHtml}
                 max={365}
                 className="w-full border border-border rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
               />
+              <p className="text-xs text-muted mt-1">How many days after purchase can customers request a refund?</p>
             </div>
           </div>
-        )}
+        );
+    }
+  };
+
+  return (
+    <div className="max-w-2xl mx-auto px-4 sm:px-6 py-12">
+      <h1 className="text-2xl font-bold text-center mb-2">{title} Generator</h1>
+      <p className="text-muted text-center mb-8">Answer a few questions to generate your customized policy.</p>
+
+      {/* Progress */}
+      <div className="flex items-center gap-2 mb-10">
+        {steps.map((s, i) => (
+          <div key={s.id} className="flex-1 flex flex-col items-center">
+            <div
+              className={cn(
+                "w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-colors",
+                i === step ? "bg-primary text-white" : i < step ? "bg-success text-white" : "bg-gray-200 text-muted"
+              )}
+            >
+              {i < step ? <Check className="w-4 h-4" /> : i + 1}
+            </div>
+            <span className="text-xs text-muted mt-1 hidden sm:block">{s.title}</span>
+          </div>
+        ))}
+      </div>
+
+      {/* Step Content */}
+      <div className="border border-border rounded-2xl p-6 sm:p-8 bg-white min-h-[320px]">
+        <h2 className="text-lg font-semibold mb-1">{steps[step].title}</h2>
+        <p className="text-sm text-muted mb-6">{steps[step].subtitle}</p>
+        {renderStepContent()}
       </div>
 
       {/* Navigation */}
