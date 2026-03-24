@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import Anthropic from "@anthropic-ai/sdk";
+import AnthropicBedrock from "@anthropic-ai/bedrock-sdk";
 import type { PolicyFormData } from "@/lib/policy-templates";
 
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
+const anthropic = new AnthropicBedrock({
+  awsAccessKey: process.env.AWS_ACCESS_KEY_ID!,
+  awsSecretKey: process.env.AWS_SECRET_ACCESS_KEY!,
+  awsRegion: process.env.AWS_REGION || "us-east-1",
 });
 
 const POLICY_TYPE_LABELS: Record<string, string> = {
@@ -90,7 +92,7 @@ Output ONLY the HTML — no markdown fences, no commentary, no preamble.`;
 
 export async function POST(req: NextRequest) {
   try {
-    if (!process.env.ANTHROPIC_API_KEY) {
+    if (!process.env.AWS_ACCESS_KEY_ID || !process.env.AWS_SECRET_ACCESS_KEY) {
       return NextResponse.json(
         { error: "AI generation is not configured" },
         { status: 503 }
@@ -110,7 +112,7 @@ export async function POST(req: NextRequest) {
     const prompt = buildPrompt(policyType, formData as PolicyFormData);
 
     const message = await anthropic.messages.create({
-      model: "claude-sonnet-4-20250514",
+      model: "anthropic.claude-sonnet-4-20250514-v1:0",
       max_tokens: 4096,
       messages: [{ role: "user", content: prompt }],
     });
