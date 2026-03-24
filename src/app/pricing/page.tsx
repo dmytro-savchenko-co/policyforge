@@ -1,10 +1,15 @@
-import Link from "next/link";
 import { Check, ArrowRight } from "lucide-react";
 import type { Metadata } from "next";
+import { PricingButton } from "@/components/pricing-button";
 
 export const metadata: Metadata = {
-  title: "Pricing — PolicyForge",
-  description: "Simple, transparent pricing. Start for free, upgrade when you need more.",
+  title: "Pricing — PolicyForge | Free Privacy Policy Generator",
+  description:
+    "Simple, transparent pricing for PolicyForge. Generate privacy policies, terms of service, and more. Start free, upgrade when you need more policies and jurisdictions.",
+  openGraph: {
+    title: "Pricing — PolicyForge",
+    description: "Generate legal pages for your website. Free to start.",
+  },
 };
 
 const plans = [
@@ -20,7 +25,7 @@ const plans = [
       "PolicyForge watermark",
     ],
     cta: "Get Started Free",
-    href: "/generator",
+    plan: "free",
     highlighted: false,
   },
   {
@@ -37,7 +42,7 @@ const plans = [
       "Email support",
     ],
     cta: "Start 7-Day Free Trial",
-    href: "/generator",
+    plan: "starter",
     highlighted: true,
   },
   {
@@ -56,7 +61,7 @@ const plans = [
       "API access",
     ],
     cta: "Start 7-Day Free Trial",
-    href: "/generator",
+    plan: "business",
     highlighted: false,
   },
 ];
@@ -93,9 +98,12 @@ export default function PricingPage() {
     <section className="py-16">
       <div className="max-w-5xl mx-auto px-4 sm:px-6">
         <div className="text-center mb-12">
-          <h1 className="text-3xl sm:text-4xl font-bold">Simple, Transparent Pricing</h1>
+          <h1 className="text-3xl sm:text-4xl font-bold">
+            Simple, Transparent Pricing
+          </h1>
           <p className="mt-4 text-lg text-muted max-w-xl mx-auto">
-            Start for free. Upgrade when you need more policies, jurisdictions, or features.
+            Start for free. Upgrade when you need more policies, jurisdictions,
+            or features.
           </p>
         </div>
 
@@ -130,28 +138,30 @@ export default function PricingPage() {
                 ))}
               </ul>
 
-              <Link
-                href={plan.href}
-                className={`mt-6 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
-                  plan.highlighted
-                    ? "bg-primary text-white hover:bg-primary-dark"
-                    : "border border-border hover:bg-secondary"
-                }`}
-              >
-                {plan.cta} <ArrowRight className="w-4 h-4" />
-              </Link>
+              <PricingButton
+                plan={plan.plan}
+                cta={plan.cta}
+                highlighted={plan.highlighted}
+              />
             </div>
           ))}
         </div>
 
         {/* FAQ */}
         <div className="mt-20">
-          <h2 className="text-2xl font-bold text-center mb-8">Frequently Asked Questions</h2>
+          <h2 className="text-2xl font-bold text-center mb-8">
+            Frequently Asked Questions
+          </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {faqs.map((faq) => (
-              <div key={faq.q} className="border border-border rounded-xl p-5 bg-white">
+              <div
+                key={faq.q}
+                className="border border-border rounded-xl p-5 bg-white"
+              >
                 <h3 className="font-semibold text-sm">{faq.q}</h3>
-                <p className="mt-2 text-sm text-muted leading-relaxed">{faq.a}</p>
+                <p className="mt-2 text-sm text-muted leading-relaxed">
+                  {faq.a}
+                </p>
               </div>
             ))}
           </div>
