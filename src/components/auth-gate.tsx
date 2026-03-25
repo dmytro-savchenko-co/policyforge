@@ -3,19 +3,28 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Shield, ArrowRight, Loader2 } from "lucide-react";
-import { supabase, isSupabaseConfigured } from "@/lib/supabase";
+import {
+  supabase,
+  isSupabaseConfigured,
+  getUserProfile,
+  canUserGenerate,
+  type UserProfile,
+} from "@/lib/supabase";
 import { getLocalGenerationCount, canGenerate } from "@/lib/usage";
 import { UpgradePrompt } from "./upgrade-prompt";
 import type { User } from "@supabase/supabase-js";
 
 interface AuthGateProps {
-  children: (props: { isPaid: boolean; onGenerated: () => void }) => React.ReactNode;
+  children: (props: {
+    isPaid: boolean;
+    userId: string | null;
+    onGenerated: () => void;
+  }) => React.ReactNode;
 }
 
 export function AuthGate({ children }: AuthGateProps) {
   const [user, setUser] = useState<User | null>(null);
-  const [plan, setPlan] = useState<string>("free");
-  const [genCount, setGenCount] = useState(0);
+  const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [overLimit, setOverLimit] = useState(false);
 
@@ -24,23 +33,24 @@ export function AuthGate({ children }: AuthGateProps) {
       if (!isSupabaseConfigured() || !supabase) {
         // Supabase not configured — fall back to localStorage tracking
         const count = getLocalGenerationCount();
-        setGenCount(count);
         setOverLimit(!canGenerate("free", count));
         setLoading(false);
         return;
       }
 
-      const { data: { user: currentUser } } = await supabase.auth.getUser();
+      const {
+        data: { user: currentUser },
+      } = await supabase.auth.getUser();
       setUser(currentUser);
 
       if (currentUser) {
-        // TODO: fetch plan from Supabase profiles table when it exists
-        // For now, default to "free" plan for all authenticated users
-        const userPlan = "free";
-        setPlan(userPlan);
-        const count = getLocalGenerationCount();
-        setGenCount(count);
-        setOverLimit(!canGenerate(userPlan, count));
+        const userProfile = await getUserProfile(currentUser.id);
+        setProfile(userProfile);
+
+        if (userProfile) {
+          const allowed = await canUserGenerate(userProfile);
+          setOverLimit(!allowed);
+        }
       }
       setLoading(false);
     }
@@ -49,10 +59,17 @@ export function AuthGate({ children }: AuthGateProps) {
   }, []);
 
   const handleGenerated = () => {
-    const newCount = genCount + 1;
-    setGenCount(newCount);
-    if (!canGenerate(plan, newCount)) {
-      setOverLimit(true);
+    if (profile) {
+      setProfile({ ...profile, generation_count: profile.generation_count + 1 });
+      const limit =
+        profile.plan === "business"
+          ? Infinity
+          : profile.plan === "starter"
+            ? 3
+            : 1;
+      if (profile.generation_count + 1 >= limit) {
+        setOverLimit(true);
+      }
     }
   };
 
@@ -71,7 +88,8 @@ export function AuthGate({ children }: AuthGateProps) {
         <Shield className="w-12 h-12 text-primary mx-auto mb-4" />
         <h2 className="text-2xl font-bold">Sign up to generate policies</h2>
         <p className="mt-3 text-muted leading-relaxed">
-          Create a free account to generate your first policy. It only takes a minute.
+          Create a free account to generate your first policy. It only takes a
+          minute.
         </p>
         <div className="mt-6 flex flex-col sm:flex-row gap-3 justify-center">
           <Link
@@ -99,6 +117,15 @@ export function AuthGate({ children }: AuthGateProps) {
     return <UpgradePrompt />;
   }
 
-  const isPaid = plan === "starter" || plan === "business";
-  return <>{children({ isPaid, onGenerated: handleGenerated })}</>;
+  const isPaid =
+    profile?.plan === "starter" || profile?.plan === "business";
+  return (
+    <>
+      {children({
+        isPaid,
+        userId: user?.id || null,
+        onGenerated: handleGenerated,
+      })}
+    </>
+  );
 }

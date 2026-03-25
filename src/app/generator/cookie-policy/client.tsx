@@ -7,12 +7,13 @@ import { AuthGate } from "@/components/auth-gate";
 export function CookieClient() {
   return (
     <AuthGate>
-      {({ isPaid, onGenerated }) => (
+      {({ isPaid, userId, onGenerated }) => (
         <PolicyWizard
           policyType="cookie-policy"
           title="Cookie Policy"
           onGenerate={generateCookiePolicy}
           isPaid={isPaid}
+          userId={userId}
           onGenerated={onGenerated}
         />
       )}

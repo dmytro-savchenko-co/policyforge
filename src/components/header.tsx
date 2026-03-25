@@ -31,6 +31,12 @@ export function Header() {
             Pricing
           </Link>
           <Link
+            href="/dashboard"
+            className="text-sm text-muted hover:text-foreground transition-colors"
+          >
+            Dashboard
+          </Link>
+          <Link
             href="/generator"
             className="bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary-dark transition-colors"
           >
@@ -61,6 +67,13 @@ export function Header() {
             onClick={() => setMobileOpen(false)}
           >
             Pricing
+          </Link>
+          <Link
+            href="/dashboard"
+            className="block text-sm text-muted hover:text-foreground"
+            onClick={() => setMobileOpen(false)}
+          >
+            Dashboard
           </Link>
           <Link
             href="/generator"

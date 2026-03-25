@@ -1,17 +1,17 @@
 "use client";
 
 import { PolicyWizard } from "@/components/policy-wizard";
-import { generateRefundPolicy } from "@/lib/policy-templates";
+import { generateEULA } from "@/lib/policy-templates";
 import { AuthGate } from "@/components/auth-gate";
 
-export function RefundClient() {
+export function EULAClient() {
   return (
     <AuthGate>
       {({ isPaid, userId, onGenerated }) => (
         <PolicyWizard
-          policyType="refund-policy"
-          title="Refund Policy"
-          onGenerate={generateRefundPolicy}
+          policyType="eula"
+          title="End-User License Agreement"
+          onGenerate={generateEULA}
           isPaid={isPaid}
           userId={userId}
           onGenerated={onGenerated}

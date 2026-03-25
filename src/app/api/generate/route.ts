@@ -13,6 +13,11 @@ const POLICY_TYPE_LABELS: Record<string, string> = {
   "terms-of-service": "Terms of Service",
   "cookie-policy": "Cookie Policy",
   "refund-policy": "Refund Policy",
+  "eula": "End-User License Agreement (EULA)",
+  "disclaimer": "Disclaimer",
+  "acceptable-use": "Acceptable Use Policy",
+  "shipping-policy": "Shipping Policy",
+  "accessibility": "Accessibility Statement",
 };
 
 function buildPrompt(policyType: string, data: PolicyFormData): string {

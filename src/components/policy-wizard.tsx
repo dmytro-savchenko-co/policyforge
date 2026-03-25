@@ -6,12 +6,14 @@ import { cn } from "@/lib/utils";
 import type { PolicyFormData } from "@/lib/policy-templates";
 import { generatePolicyWithAI } from "@/lib/generate-policy-ai";
 import { incrementLocalGenerationCount } from "@/lib/usage";
+import { saveGeneratedPolicy, incrementGenerationCount } from "@/lib/supabase";
 
 interface PolicyWizardProps {
-  policyType: "privacy-policy" | "terms-of-service" | "cookie-policy" | "refund-policy";
+  policyType: "privacy-policy" | "terms-of-service" | "cookie-policy" | "refund-policy" | "eula" | "disclaimer" | "acceptable-use" | "shipping-policy" | "accessibility";
   title: string;
   onGenerate: (data: PolicyFormData) => string;
   isPaid?: boolean;
+  userId?: string | null;
   onGenerated?: () => void;
 }
 
@@ -47,6 +49,11 @@ const STEP_CONFIGS: Record<string, StepId[]> = {
   "terms-of-service": ["business-info-terms", "jurisdictions"],
   "cookie-policy": ["business-info", "jurisdictions", "cookies", "third-party"],
   "refund-policy": ["business-info-refund", "refund-details"],
+  "eula": ["business-info-terms", "jurisdictions"],
+  "disclaimer": ["business-info"],
+  "acceptable-use": ["business-info-terms", "jurisdictions"],
+  "shipping-policy": ["business-info-refund", "refund-details"],
+  "accessibility": ["business-info"],
 };
 
 const businessTypes = [
@@ -95,7 +102,7 @@ const cookieTypeOptions = [
   { value: "marketing", label: "Marketing (advertising)" },
 ];
 
-export function PolicyWizard({ policyType, title, onGenerate, isPaid = false, onGenerated }: PolicyWizardProps) {
+export function PolicyWizard({ policyType, title, onGenerate, isPaid = false, userId = null, onGenerated }: PolicyWizardProps) {
   const [step, setStep] = useState(0);
   const [generatedHtml, setGeneratedHtml] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
@@ -152,7 +159,12 @@ export function PolicyWizard({ policyType, title, onGenerate, isPaid = false, on
       const html = onGenerate(formData);
       setGeneratedHtml(html);
     }
+    // Track usage
     incrementLocalGenerationCount();
+    if (userId) {
+      incrementGenerationCount(userId);
+      saveGeneratedPolicy(userId, policyType, title, formData, generatedHtml || "", aiGenerated);
+    }
     onGenerated?.();
   };
 

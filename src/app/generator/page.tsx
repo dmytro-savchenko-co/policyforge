@@ -1,10 +1,10 @@
 import Link from "next/link";
-import { Shield, FileText, Globe, RefreshCw, ArrowRight } from "lucide-react";
+import { Shield, FileText, Globe, RefreshCw, ArrowRight, Scale, AlertTriangle, BookOpen, Truck, Accessibility } from "lucide-react";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Free Legal Page Generator — PolicyForge",
-  description: "Generate Privacy Policies, Terms of Service, Cookie Policies, and Refund Policies for free. GDPR, CCPA, PIPEDA compliant.",
+  description: "Generate Privacy Policies, Terms of Service, Cookie Policies, Refund Policies, EULAs, Disclaimers, and more for free. GDPR, CCPA, PIPEDA compliant.",
 };
 
 const generators = [
@@ -35,6 +35,41 @@ const generators = [
     href: "/generator/refund-policy",
     icon: RefreshCw,
     tags: ["E-Commerce", "SaaS", "Services"],
+  },
+  {
+    title: "EULA Generator",
+    description: "Generate a comprehensive End-User License Agreement for your software, app, or SaaS product. Define usage rights and protect your IP.",
+    href: "/generator/eula",
+    icon: Scale,
+    tags: ["Software", "License", "IP Protection"],
+  },
+  {
+    title: "Disclaimer Generator",
+    description: "Create a professional disclaimer to limit your liability. Covers general, professional, and external links disclaimers.",
+    href: "/generator/disclaimer",
+    icon: AlertTriangle,
+    tags: ["Liability", "Legal Protection"],
+  },
+  {
+    title: "Acceptable Use Policy Generator",
+    description: "Define what users can and cannot do on your platform. Essential for SaaS, community sites, and user-generated content platforms.",
+    href: "/generator/acceptable-use",
+    icon: BookOpen,
+    tags: ["User Conduct", "Content Standards", "Platform Rules"],
+  },
+  {
+    title: "Shipping Policy Generator",
+    description: "Create a clear shipping policy for your e-commerce store. Cover delivery times, costs, international shipping, and tracking.",
+    href: "/generator/shipping-policy",
+    icon: Truck,
+    tags: ["E-Commerce", "Delivery", "International"],
+  },
+  {
+    title: "Accessibility Statement Generator",
+    description: "Demonstrate your commitment to digital accessibility with a professional ADA and WCAG compliance statement.",
+    href: "/generator/accessibility",
+    icon: Accessibility,
+    tags: ["ADA", "WCAG 2.1", "Section 508"],
   },
 ];
 

@@ -5,7 +5,7 @@ export function Footer() {
   return (
     <footer className="border-t border-border bg-secondary py-12">
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-8">
           <div className="md:col-span-1">
             <Link href="/" className="flex items-center gap-2 font-bold text-lg">
               <Shield className="w-5 h-5 text-primary" />
@@ -41,16 +41,37 @@ export function Footer() {
                   Refund Policy
                 </Link>
               </li>
+              <li>
+                <Link href="/generator/eula" className="hover:text-foreground transition-colors">
+                  EULA
+                </Link>
+              </li>
             </ul>
           </div>
 
           <div>
-            <h3 className="font-semibold text-sm mb-3">Compliance</h3>
+            <h3 className="font-semibold text-sm mb-3">More Generators</h3>
             <ul className="space-y-2 text-sm text-muted">
-              <li>GDPR (EU)</li>
-              <li>CCPA (California)</li>
-              <li>PIPEDA (Canada)</li>
-              <li>CalOPPA</li>
+              <li>
+                <Link href="/generator/disclaimer" className="hover:text-foreground transition-colors">
+                  Disclaimer
+                </Link>
+              </li>
+              <li>
+                <Link href="/generator/acceptable-use" className="hover:text-foreground transition-colors">
+                  Acceptable Use Policy
+                </Link>
+              </li>
+              <li>
+                <Link href="/generator/shipping-policy" className="hover:text-foreground transition-colors">
+                  Shipping Policy
+                </Link>
+              </li>
+              <li>
+                <Link href="/generator/accessibility" className="hover:text-foreground transition-colors">
+                  Accessibility Statement
+                </Link>
+              </li>
             </ul>
           </div>
 
