@@ -95,6 +95,22 @@ const serviceOptions = [
   { value: "google-ads", label: "Google Ads" },
 ];
 
+const languageOptions = [
+  { value: "en", label: "English" },
+  { value: "de", label: "Deutsch" },
+  { value: "fr", label: "Francais" },
+  { value: "es", label: "Espanol" },
+  { value: "pt", label: "Portugues" },
+  { value: "it", label: "Italiano" },
+  { value: "nl", label: "Nederlands" },
+  { value: "pl", label: "Polski" },
+  { value: "sv", label: "Svenska" },
+  { value: "da", label: "Dansk" },
+  { value: "fi", label: "Suomi" },
+  { value: "el", label: "Ellinika" },
+  { value: "hu", label: "Magyar" },
+];
+
 const cookieTypeOptions = [
   { value: "essential", label: "Essential (login, security)" },
   { value: "analytics", label: "Analytics (usage tracking)" },
@@ -121,6 +137,7 @@ export function PolicyWizard({ policyType, title, onGenerate, isPaid = false, us
     hasUserAccounts: false,
     sellsProducts: false,
     refundDays: 30,
+    language: "en",
   });
 
   const updateField = <K extends keyof PolicyFormData>(key: K, value: PolicyFormData[K]) => {
@@ -336,6 +353,21 @@ ${generatedHtml}
           ))}
         </div>
       </div>
+      {isPaid && (
+        <div>
+          <label className="block text-sm font-medium mb-1.5">Language</label>
+          <select
+            value={formData.language}
+            onChange={(e) => updateField("language", e.target.value)}
+            className="w-full border border-border rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
+          >
+            {languageOptions.map((l) => (
+              <option key={l.value} value={l.value}>{l.label}</option>
+            ))}
+          </select>
+          <p className="text-xs text-muted mt-1">AI-tailored policies can be generated in any language</p>
+        </div>
+      )}
     </>
   );
 

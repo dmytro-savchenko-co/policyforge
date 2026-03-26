@@ -11,6 +11,7 @@ export interface PolicyFormData {
   hasUserAccounts: boolean;
   sellsProducts: boolean;
   refundDays: number;
+  language: string;
 }
 
 const currentDate = () => {

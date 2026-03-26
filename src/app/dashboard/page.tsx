@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Shield, Plus, FileText, Download, Trash2, Loader2, Sparkles, Crown } from "lucide-react";
+import { Shield, Plus, FileText, Download, Trash2, Loader2, Sparkles, Crown, Pencil, Code, X, Check, Copy, Link as LinkIcon, Cookie } from "lucide-react";
 import {
   supabase,
   isSupabaseConfigured,
@@ -37,6 +37,8 @@ export default function DashboardPage() {
   const [policies, setPolicies] = useState<SavedPolicy[]>([]);
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState<string | null>(null);
+  const [embedModalId, setEmbedModalId] = useState<string | null>(null);
+  const [copiedField, setCopiedField] = useState<string | null>(null);
 
   useEffect(() => {
     async function load() {
@@ -85,6 +87,17 @@ export default function DashboardPage() {
     a.click();
     URL.revokeObjectURL(url);
   };
+
+  const handleCopy = async (text: string, fieldId: string) => {
+    await navigator.clipboard.writeText(text);
+    setCopiedField(fieldId);
+    setTimeout(() => setCopiedField(null), 2000);
+  };
+
+  const getEmbedScript = (id: string) =>
+    `<script src="https://policyforge.site/api/policy/embed/${id}"></script>`;
+  const getDirectLink = (id: string) =>
+    `https://policyforge.site/api/policy/${id}`;
 
   if (loading) {
     return (
@@ -137,12 +150,20 @@ export default function DashboardPage() {
               Manage your generated legal documents
             </p>
           </div>
-          <Link
-            href="/generator"
-            className="inline-flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary-dark transition-colors"
-          >
-            <Plus className="w-4 h-4" /> New Policy
-          </Link>
+          <div className="flex items-center gap-2">
+            <Link
+              href="/dashboard/consent-banner"
+              className="inline-flex items-center gap-2 border border-border px-4 py-2 rounded-lg text-sm font-medium hover:bg-secondary transition-colors"
+            >
+              <Cookie className="w-4 h-4" /> Consent Banner
+            </Link>
+            <Link
+              href="/generator"
+              className="inline-flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary-dark transition-colors"
+            >
+              <Plus className="w-4 h-4" /> New Policy
+            </Link>
+          </div>
         </div>
 
         {/* Plan + Usage Card */}
@@ -193,50 +214,126 @@ export default function DashboardPage() {
         ) : (
           <div className="space-y-3">
             {policies.map((policy) => (
-              <div
-                key={policy.id}
-                className="border border-border rounded-xl p-4 bg-white flex items-center gap-4"
-              >
-                <div className="w-10 h-10 bg-primary-light rounded-lg flex items-center justify-center shrink-0">
-                  <FileText className="w-5 h-5 text-primary" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <h3 className="font-medium text-sm truncate">
-                      {POLICY_TYPE_LABELS[policy.policy_type] || policy.title}
-                    </h3>
-                    {policy.ai_generated && (
-                      <span className="inline-flex items-center gap-1 bg-primary-light text-primary text-xs font-medium px-1.5 py-0.5 rounded-full shrink-0">
-                        <Sparkles className="w-3 h-3" /> AI
-                      </span>
-                    )}
+              <div key={policy.id}>
+                <div className="border border-border rounded-xl p-4 bg-white flex items-center gap-4">
+                  <div className="w-10 h-10 bg-primary-light rounded-lg flex items-center justify-center shrink-0">
+                    <FileText className="w-5 h-5 text-primary" />
                   </div>
-                  <p className="text-xs text-muted truncate">
-                    {policy.business_name} &middot;{" "}
-                    {new Date(policy.created_at).toLocaleDateString()}
-                  </p>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-medium text-sm truncate">
+                        {POLICY_TYPE_LABELS[policy.policy_type] || policy.title}
+                      </h3>
+                      {policy.ai_generated && (
+                        <span className="inline-flex items-center gap-1 bg-primary-light text-primary text-xs font-medium px-1.5 py-0.5 rounded-full shrink-0">
+                          <Sparkles className="w-3 h-3" /> AI
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-xs text-muted truncate">
+                      {policy.business_name} &middot;{" "}
+                      {new Date(policy.created_at).toLocaleDateString()}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-1 shrink-0">
+                    <Link
+                      href={`/dashboard/edit/${policy.id}`}
+                      className="p-2 text-muted hover:text-foreground transition-colors"
+                      title="Edit"
+                    >
+                      <Pencil className="w-4 h-4" />
+                    </Link>
+                    <button
+                      onClick={() => setEmbedModalId(embedModalId === policy.id ? null : policy.id)}
+                      className="p-2 text-muted hover:text-foreground transition-colors"
+                      title="Embed"
+                    >
+                      <Code className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={() => handleDownload(policy)}
+                      className="p-2 text-muted hover:text-foreground transition-colors"
+                      title="Download"
+                    >
+                      <Download className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={() => handleDelete(policy.id)}
+                      disabled={deleting === policy.id}
+                      className="p-2 text-muted hover:text-red-500 transition-colors disabled:opacity-50"
+                      title="Delete"
+                    >
+                      {deleting === policy.id ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <Trash2 className="w-4 h-4" />
+                      )}
+                    </button>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2 shrink-0">
-                  <button
-                    onClick={() => handleDownload(policy)}
-                    className="p-2 text-muted hover:text-foreground transition-colors"
-                    title="Download"
-                  >
-                    <Download className="w-4 h-4" />
-                  </button>
-                  <button
-                    onClick={() => handleDelete(policy.id)}
-                    disabled={deleting === policy.id}
-                    className="p-2 text-muted hover:text-red-500 transition-colors disabled:opacity-50"
-                    title="Delete"
-                  >
-                    {deleting === policy.id ? (
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                    ) : (
-                      <Trash2 className="w-4 h-4" />
-                    )}
-                  </button>
-                </div>
+
+                {/* Embed Dropdown */}
+                {embedModalId === policy.id && (
+                  <div className="border border-border border-t-0 rounded-b-xl p-4 bg-gray-50 -mt-1 space-y-4">
+                    <div className="flex items-center justify-between">
+                      <h4 className="text-sm font-semibold flex items-center gap-2">
+                        <Code className="w-4 h-4" /> Embed &amp; Share
+                      </h4>
+                      <button
+                        onClick={() => setEmbedModalId(null)}
+                        className="p-1 text-muted hover:text-foreground transition-colors"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-medium text-muted mb-1.5">
+                        Embed Script Tag
+                      </label>
+                      <div className="flex gap-2">
+                        <code className="flex-1 bg-white border border-border rounded-lg px-3 py-2 text-xs font-mono text-foreground overflow-x-auto whitespace-nowrap">
+                          {getEmbedScript(policy.id)}
+                        </code>
+                        <button
+                          onClick={() => handleCopy(getEmbedScript(policy.id), `script-${policy.id}`)}
+                          className="shrink-0 inline-flex items-center gap-1.5 bg-primary text-white px-3 py-2 rounded-lg text-xs font-medium hover:bg-primary-dark transition-colors"
+                        >
+                          {copiedField === `script-${policy.id}` ? (
+                            <><Check className="w-3 h-3" /> Copied</>
+                          ) : (
+                            <><Copy className="w-3 h-3" /> Copy</>
+                          )}
+                        </button>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-medium text-muted mb-1.5">
+                        Direct Link
+                      </label>
+                      <div className="flex gap-2">
+                        <code className="flex-1 bg-white border border-border rounded-lg px-3 py-2 text-xs font-mono text-foreground overflow-x-auto whitespace-nowrap">
+                          {getDirectLink(policy.id)}
+                        </code>
+                        <button
+                          onClick={() => handleCopy(getDirectLink(policy.id), `link-${policy.id}`)}
+                          className="shrink-0 inline-flex items-center gap-1.5 bg-primary text-white px-3 py-2 rounded-lg text-xs font-medium hover:bg-primary-dark transition-colors"
+                        >
+                          {copiedField === `link-${policy.id}` ? (
+                            <><Check className="w-3 h-3" /> Copied</>
+                          ) : (
+                            <><LinkIcon className="w-3 h-3" /> Copy</>
+                          )}
+                        </button>
+                      </div>
+                    </div>
+
+                    <p className="text-xs text-muted">
+                      Add the script tag to any webpage, or link directly to the hosted policy page.
+                    </p>
+                  </div>
+                )}
               </div>
             ))}
           </div>
