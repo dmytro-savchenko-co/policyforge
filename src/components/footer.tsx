@@ -14,7 +14,7 @@ export function Footer() {
               </span>
             </Link>
             <p className="mt-3 text-sm text-muted">
-              Generate legally compliant policies for your website or app in minutes.
+              Generate professional policies for your website or app in minutes.
             </p>
           </div>
 
@@ -87,6 +87,16 @@ export function Footer() {
                 <a href="mailto:support@policyforge.co" className="hover:text-foreground transition-colors">
                   Contact
                 </a>
+              </li>
+              <li>
+                <Link href="/legal/terms" className="hover:text-foreground transition-colors">
+                  Terms of Service
+                </Link>
+              </li>
+              <li>
+                <Link href="/legal/disclaimer" className="hover:text-foreground transition-colors">
+                  Disclaimer
+                </Link>
               </li>
             </ul>
           </div>

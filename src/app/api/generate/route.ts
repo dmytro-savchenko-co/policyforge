@@ -83,14 +83,15 @@ Jurisdictions: ${jurisdictions}
 ${policyType === "refund-policy" ? `- **Refund Window**: ${data.refundDays} days` : ""}
 
 ## Instructions
-1. Write a complete, legally-sound ${typeLabel} that is specifically tailored to ${data.businessName}'s ${bizType} business.
+1. Write a comprehensive, professionally-written ${typeLabel} that covers standard provisions typically included in such documents, tailored to ${data.businessName}'s ${bizType} business.
 2. Reference the specific third-party services by name and explain what data they process.
 3. Include all required sections for ${jurisdictions} compliance.
-4. Use professional legal language but keep it readable for non-lawyers.
+4. Use professional language commonly found in legal documents while maintaining readability.
 5. Include specific details about ${data.businessName}'s data practices — do NOT write generic placeholder text.
 6. Format the output as clean HTML with proper headings (h1, h2, h3), paragraphs, and lists.
 7. Start with <h1>${typeLabel} for ${data.businessName}</h1> and include a "Last updated" date of today.
 8. Include a Contact Us section at the end with the email ${data.contactEmail}.
+9. At the very end, include this notice in a paragraph: "This document was generated using automated tools by PolicyForge and is provided for informational purposes only. It is not legal advice. We recommend having this document reviewed by a qualified attorney."
 ${data.language && data.language !== "en" ? `9. IMPORTANT: Write the ENTIRE policy in ${data.language === "de" ? "German" : data.language === "fr" ? "French" : data.language === "es" ? "Spanish" : data.language === "pt" ? "Portuguese" : data.language === "it" ? "Italian" : data.language === "nl" ? "Dutch" : data.language === "pl" ? "Polish" : data.language === "sv" ? "Swedish" : data.language === "da" ? "Danish" : data.language === "fi" ? "Finnish" : data.language === "el" ? "Greek" : data.language === "hu" ? "Hungarian" : data.language}. All headings, paragraphs, and legal text must be in this language.` : ""}
 
 Output ONLY the HTML — no markdown fences, no commentary, no preamble.`;

@@ -61,8 +61,8 @@ const features = [
   },
   {
     icon: Clock,
-    title: "No Lawyer Needed",
-    description: "Save $500-$2,000 per policy. Our templates are crafted by legal professionals.",
+    title: "Get Started in Minutes",
+    description: "Generate your first draft in under 2 minutes. Attorney review recommended for your specific situation.",
   },
   {
     icon: Shield,
@@ -94,8 +94,8 @@ export default function HomePage() {
             <span className="text-primary">in Minutes, Not Hours</span>
           </h1>
           <p className="mt-6 text-lg sm:text-xl text-muted max-w-2xl mx-auto leading-relaxed">
-            Privacy Policies, Terms of Service, Cookie Policies — all legally compliant
-            with GDPR, CCPA, and more. No lawyer needed. Free to start.
+            Privacy Policies, Terms of Service, Cookie Policies — covering GDPR, CCPA, and more
+            with GDPR, CCPA, and more. Get started in minutes.
           </p>
           <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
             <Link
@@ -166,7 +166,7 @@ export default function HomePage() {
           <div className="text-center mb-12">
             <h2 className="text-3xl sm:text-4xl font-bold">Why PolicyForge?</h2>
             <p className="mt-4 text-lg text-muted max-w-xl mx-auto">
-              Everything you need to stay legally compliant, without the legal bills.
+              Everything you need to get your legal pages in order, fast.
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">

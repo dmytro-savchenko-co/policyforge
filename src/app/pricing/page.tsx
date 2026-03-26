@@ -76,8 +76,8 @@ const faqs = [
     a: "Absolutely. You can change your plan at any time. If you downgrade, you'll keep access until the end of your billing period.",
   },
   {
-    q: "Are these policies legally valid?",
-    a: "Our templates are crafted based on current legal requirements for GDPR, CCPA, PIPEDA, and other regulations. However, we recommend having a lawyer review your policies for your specific situation.",
+    q: "Are these policies a substitute for legal advice?",
+    a: "PolicyForge is not a law firm and does not provide legal advice. Our documents cover standard provisions typically found in legal policies for various jurisdictions. We strongly recommend having a qualified attorney review any generated document before publication.",
   },
   {
     q: "What happens when laws change?",

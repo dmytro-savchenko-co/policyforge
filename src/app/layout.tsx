@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     template: "%s | PolicyForge",
   },
   description:
-    "Generate legally compliant Privacy Policies, Terms of Service, Cookie Policies, and more. Free, fast, and built for modern businesses. GDPR, CCPA, PIPEDA compliant.",
+    "Generate comprehensive Privacy Policies, Terms of Service, Cookie Policies, and more. Free, fast, and built for modern businesses. GDPR, CCPA, PIPEDA compliant.",
   keywords: [
     "privacy policy generator",
     "terms of service generator",
@@ -31,7 +31,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "PolicyForge — Generate Legal Pages in Minutes",
     description:
-      "Generate legally compliant Privacy Policies, Terms of Service, and more. Free and fast.",
+      "Generate comprehensive Privacy Policies, Terms of Service, and more. Free and fast.",
     type: "website",
     siteName: "PolicyForge",
     url: "https://policyforge.site",
@@ -51,7 +51,7 @@ const jsonLd = {
   "@type": "SoftwareApplication",
   name: "PolicyForge",
   applicationCategory: "BusinessApplication",
-  description: "Generate legally compliant privacy policies, terms of service, cookie policies, and more.",
+  description: "Generate comprehensive privacy policies, terms of service, cookie policies, and more.",
   url: "https://policyforge.site",
   offers: [
     {

@@ -81,7 +81,7 @@ export default function GeneratorPage() {
           <h1 className="text-3xl sm:text-4xl font-bold">Legal Page Generators</h1>
           <p className="mt-4 text-lg text-muted max-w-xl mx-auto">
             Choose the policy you need. Answer a few questions and get a professionally written,
-            legally compliant document in under 2 minutes.
+            professionally written document in under 2 minutes.
           </p>
         </div>
 
