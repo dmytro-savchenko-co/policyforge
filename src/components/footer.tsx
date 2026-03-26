@@ -102,8 +102,9 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="mt-10 pt-6 border-t border-border text-center text-xs text-muted">
-          &copy; {new Date().getFullYear()} PolicyForge. All rights reserved.
+        <div className="mt-10 pt-6 border-t border-border text-center text-xs text-muted space-y-2">
+          <p>PolicyForge is not a law firm and does not provide legal advice. All content is for informational purposes only and is not a substitute for professional legal advice.</p>
+          <p>&copy; {new Date().getFullYear()} PolicyForge. All rights reserved.</p>
         </div>
       </div>
     </footer>

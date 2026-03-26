@@ -276,9 +276,6 @@ ${generatedHtml}
             </button>
           </div>
         </div>
-        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-4 text-sm text-amber-800">
-          <strong>Important Notice:</strong> This document was generated using automated tools by PolicyForge and is provided for informational purposes only. PolicyForge is not a law firm and does not provide legal advice. We recommend having this document reviewed by a qualified attorney licensed in your jurisdiction before publication.
-        </div>
         <div
           className="prose prose-sm max-w-none border border-border rounded-2xl p-8 bg-white [&_h1]:text-2xl [&_h1]:font-bold [&_h1]:border-b [&_h1]:border-border [&_h1]:pb-3 [&_h2]:text-lg [&_h2]:font-semibold [&_h2]:text-primary [&_h2]:mt-8 [&_h3]:text-base [&_h3]:font-semibold [&_ul]:list-disc [&_ul]:pl-6 [&_li]:mb-2 [&_a]:text-primary [&_a]:underline"
           dangerouslySetInnerHTML={{ __html: generatedHtml }}
@@ -583,8 +580,6 @@ ${generatedHtml}
             Next <ArrowRight className="w-4 h-4" />
           </button>
         ) : (
-          <div className="flex items-center gap-3">
-            <p className="text-xs text-muted max-w-[200px]">By generating, you acknowledge this is not legal advice.</p>
           <button
             onClick={handleGenerate}
             disabled={generating}
@@ -596,7 +591,6 @@ ${generatedHtml}
               <>Generate Policy <ArrowRight className="w-4 h-4" /></>
             )}
           </button>
-          </div>
         )}
       </div>
     </div>
