@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Shield, Plus, FileText, Download, Trash2, Loader2, Sparkles, Crown, Pencil, Code, X, Check, Copy, Link as LinkIcon, Cookie } from "lucide-react";
+import { Shield, Plus, FileText, Download, Trash2, Loader2, Sparkles, Crown, Pencil, Code, X, Check, Copy, Link as LinkIcon, Cookie, Settings } from "lucide-react";
 import {
   supabase,
   isSupabaseConfigured,
@@ -151,6 +151,13 @@ export default function DashboardPage() {
             </p>
           </div>
           <div className="flex items-center gap-2">
+            <Link
+              href="/dashboard/settings"
+              className="inline-flex items-center gap-2 border border-border px-3 py-2 rounded-lg text-sm hover:bg-secondary transition-colors"
+              title="Settings"
+            >
+              <Settings className="w-4 h-4" />
+            </Link>
             <Link
               href="/dashboard/consent-banner"
               className="inline-flex items-center gap-2 border border-border px-4 py-2 rounded-lg text-sm font-medium hover:bg-secondary transition-colors"

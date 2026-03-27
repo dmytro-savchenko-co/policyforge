@@ -2,16 +2,14 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Shield, Loader2 } from "lucide-react";
+import { Shield, Loader2, CheckCircle } from "lucide-react";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
-import { useRouter } from "next/navigation";
 
-export default function LoginPage() {
+export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const router = useRouter();
+  const [sent, setSent] = useState(false);
 
   if (!isSupabaseConfigured()) {
     return (
@@ -19,36 +17,47 @@ export default function LoginPage() {
         <div className="max-w-sm mx-auto px-4 text-center">
           <Shield className="w-12 h-12 text-primary mx-auto mb-4" />
           <h1 className="text-2xl font-bold">Coming Soon</h1>
+        </div>
+      </section>
+    );
+  }
+
+  if (sent) {
+    return (
+      <section className="py-20">
+        <div className="max-w-sm mx-auto px-4 text-center">
+          <CheckCircle className="w-12 h-12 text-success mx-auto mb-4" />
+          <h1 className="text-2xl font-bold">Check your email</h1>
           <p className="mt-2 text-muted">
-            User accounts are coming soon. For now, you can generate policies
-            for free without an account.
+            We sent a password reset link to <strong>{email}</strong>.
+            Click the link in the email to set a new password.
           </p>
           <Link
-            href="/generator"
-            className="mt-6 inline-block bg-primary text-white px-6 py-2.5 rounded-lg font-medium hover:bg-primary-dark transition-colors"
+            href="/auth/login"
+            className="mt-6 inline-block text-primary font-medium hover:underline text-sm"
           >
-            Generate a Policy
+            Back to login
           </Link>
         </div>
       </section>
     );
   }
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError("");
 
-    const { error: authError } = await supabase!.auth.signInWithPassword({
-      email,
-      password,
+    const { error: resetError } = await supabase!.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/auth/reset-password`,
     });
 
-    if (authError) {
-      setError(authError.message);
+    if (resetError) {
+      setError(resetError.message);
       setLoading(false);
     } else {
-      router.push("/dashboard");
+      setSent(true);
+      setLoading(false);
     }
   };
 
@@ -57,13 +66,13 @@ export default function LoginPage() {
       <div className="max-w-sm mx-auto px-4">
         <div className="text-center mb-8">
           <Shield className="w-10 h-10 text-primary mx-auto mb-3" />
-          <h1 className="text-2xl font-bold">Welcome back</h1>
+          <h1 className="text-2xl font-bold">Reset your password</h1>
           <p className="mt-1 text-sm text-muted">
-            Sign in to manage your policies
+            Enter your email and we&apos;ll send you a reset link
           </p>
         </div>
 
-        <form onSubmit={handleLogin} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4">
           {error && (
             <div className="bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-2.5 rounded-lg">
               {error}
@@ -80,44 +89,19 @@ export default function LoginPage() {
               placeholder="you@example.com"
             />
           </div>
-          <div>
-            <label className="block text-sm font-medium mb-1.5">
-              Password
-            </label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              className="w-full border border-border rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
-              placeholder="Your password"
-            />
-          </div>
           <button
             type="submit"
             disabled={loading}
             className="w-full bg-primary text-white py-2.5 rounded-lg font-medium hover:bg-primary-dark transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
           >
-            {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Sign In"}
+            {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Send Reset Link"}
           </button>
         </form>
 
-        <div className="mt-4 text-center">
-          <Link
-            href="/auth/forgot-password"
-            className="text-sm text-muted hover:text-primary transition-colors"
-          >
-            Forgot your password?
-          </Link>
-        </div>
-
-        <p className="mt-4 text-center text-sm text-muted">
-          Don&apos;t have an account?{" "}
-          <Link
-            href="/auth/signup"
-            className="text-primary font-medium hover:underline"
-          >
-            Sign up
+        <p className="mt-6 text-center text-sm text-muted">
+          Remember your password?{" "}
+          <Link href="/auth/login" className="text-primary font-medium hover:underline">
+            Sign in
           </Link>
         </p>
       </div>
